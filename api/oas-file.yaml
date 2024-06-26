@@ -1,0 +1,80 @@
+openapi: 3.0.0
+info:
+  title: Calculator API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /token:
+    post:
+      summary: Generate JWT Token
+      operationId: generateToken
+      responses:
+        '200':
+          description: Successful token generation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+      security: [] # No security required for token generation
+
+  /calculate:
+    post:
+      summary: Perform arithmetic operations
+      operationId: calculate
+      parameters:
+      - name: operation
+        in: header
+        description: "The arithmetic operation to perform (add, subtract, multiply,\
+          \ divide)"
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - add
+          - subtract
+          - multiply
+          - divide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                num1:
+                  type: number
+                num2:
+                  type: number
+              required:
+                - num1
+                - num2
+      responses:
+        '200':
+          description: Successful calculation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: number
+        '400':
+          description: Invalid input or operation
+        '401':
+          description: Unauthorized
+      security:
+      - BearerAuth: [] # JWT Bearer token required for authorization
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
